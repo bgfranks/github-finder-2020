@@ -10,6 +10,7 @@ export const GithubProvider = ({ children }) => {
   const initialState = {
     users: [],
     user: {},
+    repos: [],
     loading: false,
   }
 
@@ -47,7 +48,7 @@ export const GithubProvider = ({ children }) => {
   const getUser = async (login) => {
     setLoading()
 
-    // fetches the user serach from the api and sends the token
+    // fetches the user from the api and sends the token
     const res = await fetch(`${GITHUB_URL}/users/${login}`, {
       headers: {
         Authorization: `token ${GITHUB_TOKEN}`,
@@ -59,12 +60,38 @@ export const GithubProvider = ({ children }) => {
     } else {
       const data = await res.json()
 
-      // dispatches the seach and sends the search data
+      // dispatches the user and sends the user data
       dispatch({
         type: 'GET_USER',
         payload: data,
       })
     }
+  }
+
+  // gets the users repos
+  const getUserRepos = async (login) => {
+    setLoading()
+
+    // sorts the number of repo based on created date and sets the number displayed to 10
+    const params = new URLSearchParams({
+      sort: 'created',
+      per_page: 10,
+    })
+
+    // fetches the repos serach from the api and sends the token
+    const res = await fetch(`${GITHUB_URL}/users/${login}/repos?${params}`, {
+      headers: {
+        Authorization: `token ${GITHUB_TOKEN}`,
+      },
+    })
+
+    const data = await res.json()
+
+    // dispatches the repos and sends the repos data
+    dispatch({
+      type: 'GET_REPOS',
+      payload: data,
+    })
   }
 
   // clears the user search from state
@@ -78,9 +105,11 @@ export const GithubProvider = ({ children }) => {
         users: state.users,
         loading: state.loading,
         user: state.user,
+        repos: state.repos,
         searchUsers,
         clearUsers,
         getUser,
+        getUserRepos,
       }}
     >
       {children}

@@ -7,15 +7,18 @@ import GithubContext from '../context/github/GithubContext'
 
 // components
 import Spinner from '../components/layout/Spinner'
+import RepoList from '../components/repos/RepoList'
 
 export default function User() {
-  const { getUser, user, loading } = useContext(GithubContext)
+  const { getUser, user, loading, getUserRepos, repos } =
+    useContext(GithubContext)
 
   // grabs the router params
   const params = useParams()
 
   useEffect(() => {
     getUser(params.login)
+    getUserRepos(params.login)
   }, [])
 
   // destructuring the user object
@@ -163,6 +166,7 @@ export default function User() {
             </div>
           </div>
         </div>
+        <RepoList repos={repos} />
       </div>
     </>
   )
